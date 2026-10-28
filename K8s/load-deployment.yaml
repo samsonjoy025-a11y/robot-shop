@@ -15,21 +15,24 @@ spec:
         service: load
     spec:
       containers:
-      - name: load
-        env:
-          - name: HOST
-            value: "http://web:8080/"
-          - name: NUM_CLIENTS
-            value: "15"
-          - name: SILENT
-            value: "1"
-          - name: ERROR
-            value: "1"
-        image: robotshop/rs-load:latest
-        resources:
-          limits:
-            cpu: 200m
-            memory: 200Mi
-          requests:
-            cpu: 100m
-            memory: 100Mi
+        - name: load
+          image: robotshop/rs-load:2.1.0
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: HOST
+              value: "http://web:8080/"
+            - name: NUM_CLIENTS
+              value: "2"
+            - name: RUN_TIME
+              value: "10m"
+            - name: SILENT
+              value: "1"
+            - name: ERROR
+              value: "0"
+          resources:
+            limits:
+              cpu: 200m
+              memory: 200Mi
+            requests:
+              cpu: 100m
+              memory: 100Mi
