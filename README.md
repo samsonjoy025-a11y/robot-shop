@@ -126,3 +126,72 @@ $ curl http://<host>:8080/api/cart/metrics
 $ curl http://<host>:8080/api/payment/metrics
 ```
 
+
+---
+
+# DevOps Capstone: Deployment, Logging and Operations
+
+This repository was extended as a hands-on DevOps capstone using Kubernetes, Helm, and a local Minikube cluster.
+
+## Project Work Completed
+
+- Deployed Robot Shop using the Helm chart in `K8s/helm`.
+- Updated application deployment configurations and removed Instana agent host settings from the targeted service templates.
+- Added Fluent Bit and Loki configuration for Kubernetes container log collection and querying.
+- Created operational documentation covering incident response, an incident postmortem, and an availability SLO policy.
+- Performed an application availability drill by scaling the web deployment down to zero replicas and restoring it to one replica.
+- Committed and pushed the project changes to the `master` branch.
+
+## Logging Architecture
+
+The logging pipeline collects Kubernetes container logs using Fluent Bit and sends them to Loki for querying.
+
+Configuration files:
+
+- `fluent-bit-values.yaml` — Fluent Bit collection, Kubernetes metadata filtering, and Loki output configuration.
+- `loki-writable-values.yaml` — Loki configuration for the local lab environment.
+
+### Logging Verification
+
+The Loki readiness endpoint returned `ready`. The Loki labels API returned successfully, and a range query for the `robot-shop` namespace returned real application log entries.
+
+Example local verification, with the Loki port-forward running:
+
+```powershell
+Invoke-RestMethod http://127.0.0.1:3101/ready
+
+$query = [uri]::EscapeDataString('{namespace="robot-shop"}')
+$result = Invoke-RestMethod -Uri "http://127.0.0.1:3101/loki/api/v1/query_range?query=$query&limit=5"
+$result.data.result | ConvertTo-Json -Depth 8
+```
+
+The port-forward maps local port `3101` to Loki service port `3100`.
+
+## Operational Documentation
+
+See `docs/operations/` for:
+
+- `incident-runbook.md` — incident detection, triage, mitigation, recovery, and closure.
+- `postmortem.md` — the web availability drill, recovery actions, and lessons learned.
+- `slo-policy.md` — the proposed availability target, error budget, and alerting policy.
+
+The availability target is a proposed lab policy, not a measured production SLO.
+
+## Current Limitations
+
+This is a local learning environment, not a production-ready deployment.
+
+- The Kubernetes API has experienced intermittent timeouts.
+- The `ratings` pod was not Ready during the last successful pod listing.
+- Prometheus and Grafana were installed, but some monitoring components were restarting and the stack was not consistently healthy.
+- A successful end-to-end OpenTelemetry trace has not been verified.
+- Slack alert delivery has not been verified.
+
+These items remain outstanding and should be resolved before treating the full observability setup as complete.
+
+## Reproducibility and Safety
+
+Use the Helm chart and configuration files in this repository as the starting point for reproducing the lab. Confirm that the Minikube cluster and required namespaces are healthy before applying changes.
+
+The included Loki configuration uses local lab storage and is not intended for durable production log retention. Do not commit credentials, API tokens, or Slack webhook URLs.
+
