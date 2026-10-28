@@ -60,3 +60,28 @@ Do not claim that the target was achieved unless monitoring evidence supports it
 ## 9. Review
 
 Review this objective after the lab exercise. In a real service, set the SLO using user expectations, business impact, and observed reliability data.
+
+## 10. Current Capstone Implementation Status
+
+### Dashboard as code
+- Dashboard file: `observability/grafana/robot-shop-overview.json`
+- Local JSON syntax validation: passed.
+- Live Grafana dashboard import and panel validation: not completed because the local monitoring stack is unstable and the Grafana endpoint is currently unreachable.
+- Container CPU query: previously returned data in Prometheus during this lab.
+- HTTP request rate, HTTP 5xx error rate, and p95 latency queries: provisional. Confirm the actual application metric names and labels before relying on these panels.
+
+### SLO and alert status
+- Availability target: proposed at 99% over a rolling 30-day window.
+- Measured SLI and achieved SLO: not yet verified.
+- Alert rule evaluation: not verified.
+- Slack notification delivery: not verified.
+- Incident runbook: `docs/operations/incident-runbook.md`
+
+### Evidence required to close this work
+1. Import the dashboard and confirm that the Prometheus datasource is working.
+2. Validate request-rate, error-rate, and latency queries against real application metrics.
+3. Implement and test the availability SLI using a documented measurement method.
+4. Test the warning alert and verify notification delivery to Slack.
+5. Link the runbook from the alert annotation or notification.
+
+Do not report the dashboard panels, measured SLO, alert, or Slack notification as operational until the corresponding tests have passed.
